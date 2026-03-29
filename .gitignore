@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.bak
+
+# Models & Weights
+checkpoints/
+hf_upload/
+*.pt
+*.safetensors
+*.bin
+
+# Environment & Logs
+.env
+logs_wandb.ai/
+wandb/
+*.log
+
+# OS
+.DS_Store
+
+# Include docs as requested
+!/doc/

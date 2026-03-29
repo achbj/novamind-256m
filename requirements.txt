@@ -1,0 +1,18 @@
+# NovaMind-256M Requirements
+# Install: pip install -r requirements.txt
+
+# Core deep learning
+torch>=2.2.0          # Flash Attention 2 via F.scaled_dot_product_attention
+torchvision           # optional, useful for dev tools
+
+# HuggingFace ecosystem
+transformers>=4.38.0  # tokenizer (LLaMA-2 or GPT-2 fallback)
+datasets>=2.18.0      # FineWeb-Edu, TinyStories, Alpaca, GSM8K, OpenHermes
+huggingface_hub>=0.21.0
+
+# Logging & tracking
+wandb>=0.16.0         # optional — graceful fallback to local JSON if missing
+tqdm
+
+# Utilities
+numpy
