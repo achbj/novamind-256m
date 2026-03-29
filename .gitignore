@@ -22,3 +22,4 @@ wandb/
 
 # Include docs as requested
 !/doc/
+./upload_to_hf.py
