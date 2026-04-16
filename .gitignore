@@ -22,4 +22,6 @@ wandb/
 
 # Include docs as requested
 !/doc/
-./upload_to_hf.py
+upload_to_hf.py
+/doc/*.html
+/doc/*.tex
