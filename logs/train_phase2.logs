@@ -1,0 +1,203 @@
+=================================================================
+  🚀 Phase 2: SFT Fine-tuning on H100
+  Data:     /vol/data/phase2_sft_chunks.pt
+  Resume:   /vol/checkpoints/novamind_pretrain_final.pt
+  Out:      /vol/checkpoints
+  Fixes:    500x identity seeds | 2x EOS weight | pre-tokenized
+=================================================================
+  CMD: python /workspace/train.py --phase sft --data_file /vol/data/phase2_sft_chunks.pt --resume /vol/checkpoints/novamind_pretrain_final.pt --out_dir /vol/checkpoints --batch_size 16 --grad_accum_steps 4 --lr 1e-4 --warmup_steps 500 --epochs 2 --max_seq_len 2048 --save_every 500 --milestone_every 2000 --val_every 500 --val_batches 50 --log_every 10 --num_workers 4 --compile --no_wandb
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+═════════════════════════════════════════════════════════════════
+  🚀 NovaMind-256M Training
+  Phase : SFT — Phase 2 — Instruction SFT (~300M tokens: Alpaca + DailyDialog)
+  Device: cuda  Precision: torch.bfloat16
+  GPU 0 : NVIDIA H100 80GB HBM3  (85.0 GB)
+  Peak LR: 1.00e-04 → min 1.00e-05  | Warmup: 500 steps
+  Batch: 16 seqs × 2048 tokens × 4 accum = 131,072 tok/update
+  Think-token loss weight: 0.5
+  Checkpoint every: 500 steps  |  Milestone every: 2000 steps
+═════════════════════════════════════════════════════════════════
+
+🔤 Loading tokenizer...
+   ✅ NousResearch/Llama-2-7b-hf — vocab: 32,000
+
+📂 Loading sft dataset...
+   ⚡ Loading pre-tokenized SFT data from disk: /vol/data/phase2_sft_chunks.pt
+   ✅ 23,335 chunks (0.05B tokens)
+   Train: 22,169 chunks | Val: 1,166 chunks
+   DataLoader: 1,386 batches × 16
+
+🏗️  Building model...
+⚡ torch.compile enabled...
+──────────────────────────────────────────────
+  NovaMind-256M Parameter Breakdown
+──────────────────────────────────────────────
+  Token Embedding (shared w/ lm_head)       32.77M
+  Attention QKV projections (per layer)      1.57M
+  Attention O projection (per layer)         1.05M
+  SwiGLU FFN (per layer)                     7.08M
+  RMSNorm × 2 (per layer)                  0.0020M
+  × {n} layers total                       232.83M
+  Final RMSNorm                            0.0010M
+  LM Head (weight-tied to embedding)          →  0.00M
+──────────────────────────────────────────────
+  TOTAL (formula estimate)                 265.60M
+  TOTAL (actual PyTorch count)             265.60M
+──────────────────────────────────────────────
+
+   Steps/epoch: 347  |  Total max steps: 694
+   Estimated training time on H100: ~0.1 hrs
+
+
+📂 Loading checkpoint: /vol/checkpoints/novamind_pretrain_final.pt
+   ✅ Resumed: phase=pretrain | step=17,829 | tokens=3.277B | last_loss=2.0787129402160645
+
+   ⏩ Transitioning from phase 'pretrain' to 'sft'. Resetting step counter.
+
+📊 Logger ready:
+   JSON-lines → /vol/checkpoints/log_sft_20260501_083611.jsonl
+   CSV        → /vol/checkpoints/log_sft_20260501_083611.csv
+   W&B        → disabled (install wandb for cloud tracking)
+
+═════════════════════════════════════════════════════════════════
+  🚦 TRAINING STARTED — Phase: SFT
+  Resume from step: 0  |  Target: 694 steps
+═════════════════════════════════════════════════════════════════
+
+  📅 Epoch 1/2
+  step      10 [████████████████████] loss=1.9853 (think=1.0418 resp=3.3813) | lr=2.00e-06 gnorm=3.851 |   288,483 tok/s | mem=15.8GB | elapsed=0.5m ETA=32m
+  step      20 [████████████████████] loss=1.9734 (think=0.1326 resp=3.0440) | lr=4.00e-06 gnorm=2.967 |   300,708 tok/s | mem=15.8GB | elapsed=0.8m ETA=25m
+  step      30 [████████████████████] loss=1.6090 (think=0.0144 resp=2.4704) | lr=6.00e-06 gnorm=1.723 |   300,809 tok/s | mem=15.8GB | elapsed=1.0m ETA=23m
+  step      40 [████████████████████] loss=1.3728 (think=0.0043 resp=2.6637) | lr=8.00e-06 gnorm=0.987 |   291,490 tok/s | mem=15.8GB | elapsed=1.3m ETA=22m
+  step      50 [████████████████████] loss=1.5911 (think=0.0277 resp=2.0765) | lr=1.00e-05 gnorm=0.846 |   300,464 tok/s | mem=15.8GB | elapsed=1.6m ETA=21m
+  step      60 [████████████████████] loss=1.6621 (think=0.0030 resp=3.3728) | lr=1.20e-05 gnorm=0.855 |   300,868 tok/s | mem=15.8GB | elapsed=1.9m ETA=20m
+  step      70 [████████████████████] loss=1.2767 (think=0.0035 resp=2.7312) | lr=1.40e-05 gnorm=0.870 |   300,807 tok/s | mem=15.8GB | elapsed=2.2m ETA=19m
+  step      80 [████████████████████] loss=1.6785 (think=0.0032 resp=2.4103) | lr=1.60e-05 gnorm=0.912 |   300,788 tok/s | mem=15.8GB | elapsed=2.5m ETA=19m
+  step      90 [████████████████████] loss=1.1626 (think=0.0567 resp=1.7926) | lr=1.80e-05 gnorm=0.724 |   294,560 tok/s | mem=15.8GB | elapsed=2.7m ETA=18m
+  step     100 [████████████████████] loss=1.4615 (think=0.0068 resp=2.5660) | lr=2.00e-05 gnorm=1.506 |   300,820 tok/s | mem=15.8GB | elapsed=3.0m ETA=18m
+  step     110 [████████████████████] loss=1.2086 (think=0.0131 resp=2.4370) | lr=2.20e-05 gnorm=0.761 |   300,719 tok/s | mem=15.8GB | elapsed=3.3m ETA=18m
+  step     120 [████████████████████] loss=1.4017 (think=0.0066 resp=2.0912) | lr=2.40e-05 gnorm=0.999 |   294,308 tok/s | mem=15.8GB | elapsed=3.6m ETA=17m
+  step     130 [████████████████████] loss=1.3652 (think=0.0009 resp=2.4654) | lr=2.60e-05 gnorm=1.067 |   300,828 tok/s | mem=15.8GB | elapsed=3.9m ETA=17m
+  step     140 [████████████████████] loss=1.2592 (think=0.0079 resp=1.8993) | lr=2.80e-05 gnorm=1.056 |   294,823 tok/s | mem=15.8GB | elapsed=4.2m ETA=16m
+  step     150 [████████████████████] loss=1.5117 (think=0.0071 resp=2.6241) | lr=3.00e-05 gnorm=0.904 |   300,638 tok/s | mem=15.8GB | elapsed=4.5m ETA=16m
+  step     160 [████████████████████] loss=1.3731 (think=0.0051 resp=1.9573) | lr=3.20e-05 gnorm=0.886 |   300,765 tok/s | mem=15.8GB | elapsed=4.7m ETA=16m
+  step     170 [████████████████████] loss=1.2590 (think=0.0015 resp=2.3390) | lr=3.40e-05 gnorm=0.818 |   300,694 tok/s | mem=15.8GB | elapsed=5.0m ETA=16m
+  step     180 [████████████████████] loss=1.1489 (think=0.0068 resp=1.9164) | lr=3.60e-05 gnorm=0.846 |   300,702 tok/s | mem=15.8GB | elapsed=5.3m ETA=15m
+  step     190 [████████████████████] loss=1.2557 (think=0.0050 resp=2.0132) | lr=3.80e-05 gnorm=0.722 |   300,482 tok/s | mem=15.8GB | elapsed=5.6m ETA=15m
+  step     200 [████████████████████] loss=1.2009 (think=0.0088 resp=2.4839) | lr=4.00e-05 gnorm=0.735 |   300,978 tok/s | mem=15.8GB | elapsed=5.9m ETA=14m
+  step     210 [████████████████████] loss=1.1573 (think=0.0229 resp=2.3217) | lr=4.20e-05 gnorm=0.682 |   300,876 tok/s | mem=15.8GB | elapsed=6.2m ETA=14m
+  step     220 [████████████████████] loss=1.3889 (think=0.0084 resp=2.0943) | lr=4.40e-05 gnorm=0.742 |   292,315 tok/s | mem=15.8GB | elapsed=6.4m ETA=14m
+  step     230 [████████████████████] loss=1.0675 (think=0.0070 resp=1.4795) | lr=4.60e-05 gnorm=1.336 |   301,162 tok/s | mem=15.8GB | elapsed=6.7m ETA=14m
+  step     240 [████████████████████] loss=1.1577 (think=0.0113 resp=2.5419) | lr=4.80e-05 gnorm=1.044 |   300,878 tok/s | mem=15.8GB | elapsed=7.0m ETA=13m
+  step     250 [████████████████████] loss=1.2763 (think=0.0112 resp=2.2808) | lr=5.00e-05 gnorm=0.803 |   301,165 tok/s | mem=15.8GB | elapsed=7.3m ETA=13m
+  step     260 [████████████████████] loss=1.1743 (think=0.0072 resp=1.7669) | lr=5.20e-05 gnorm=0.970 |   300,995 tok/s | mem=15.8GB | elapsed=7.6m ETA=13m
+  step     270 [████████████████████] loss=1.1426 (think=0.0266 resp=1.7937) | lr=5.40e-05 gnorm=0.715 |   300,758 tok/s | mem=15.8GB | elapsed=7.8m ETA=12m
+  step     280 [████████████████████] loss=1.1629 (think=0.0180 resp=1.5782) | lr=5.60e-05 gnorm=0.930 |   300,286 tok/s | mem=15.8GB | elapsed=8.1m ETA=12m
+  step     290 [████████████████████] loss=1.1471 (think=0.0026 resp=2.0983) | lr=5.80e-05 gnorm=0.686 |   300,618 tok/s | mem=15.8GB | elapsed=8.4m ETA=12m
+  step     300 [████████████████████] loss=1.1391 (think=0.0262 resp=1.6352) | lr=6.00e-05 gnorm=0.847 |   300,490 tok/s | mem=15.8GB | elapsed=8.7m ETA=11m
+  step     310 [████████████████████] loss=1.2983 (think=0.0040 resp=2.3457) | lr=6.20e-05 gnorm=0.793 |   300,434 tok/s | mem=15.8GB | elapsed=9.0m ETA=11m
+  step     320 [████████████████████] loss=1.0637 (think=0.0040 resp=2.0149) | lr=6.40e-05 gnorm=0.755 |   300,815 tok/s | mem=15.8GB | elapsed=9.3m ETA=11m
+  step     330 [████████████████████] loss=1.1190 (think=0.0087 resp=1.6660) | lr=6.60e-05 gnorm=0.654 |   300,781 tok/s | mem=15.8GB | elapsed=9.6m ETA=10m
+  step     340 [████████████████████] loss=1.2121 (think=0.0165 resp=1.7479) | lr=6.80e-05 gnorm=0.746 |   301,057 tok/s | mem=15.8GB | elapsed=9.8m ETA=10m
+
+  ✅ Epoch 1/2 done | steps=346 | tokens=3.322B
+
+  📅 Epoch 2/2
+  step     350 [████████████████████] loss=1.1528 (think=0.0011 resp=1.7449) | lr=7.00e-05 gnorm=1.119 |   300,954 tok/s | mem=15.8GB | elapsed=10.2m ETA=10m
+  step     360 [████████████████████] loss=1.3285 (think=0.0071 resp=1.4439) | lr=7.20e-05 gnorm=0.579 |   300,932 tok/s | mem=15.8GB | elapsed=10.5m ETA=10m
+  step     370 [████████████████████] loss=1.2535 (think=0.0070 resp=1.2664) | lr=7.40e-05 gnorm=0.750 |   300,872 tok/s | mem=15.8GB | elapsed=10.8m ETA=10m
+  step     380 [████████████████████] loss=1.2360 (think=0.0010 resp=2.2591) | lr=7.60e-05 gnorm=0.757 |   292,942 tok/s | mem=15.8GB | elapsed=11.1m ETA=9m
+  step     390 [████████████████████] loss=1.0679 (think=0.0002 resp=2.2035) | lr=7.80e-05 gnorm=0.771 |   300,608 tok/s | mem=15.8GB | elapsed=11.4m ETA=9m
+  step     400 [████████████████████] loss=1.0097 (think=0.0099 resp=2.0128) | lr=8.00e-05 gnorm=0.718 |   300,775 tok/s | mem=15.8GB | elapsed=11.7m ETA=9m
+  step     410 [████████████████████] loss=1.0403 (think=0.0119 resp=1.4458) | lr=8.20e-05 gnorm=0.607 |   300,443 tok/s | mem=15.8GB | elapsed=11.9m ETA=8m
+  step     420 [████████████████████] loss=1.0789 (think=0.0047 resp=2.6394) | lr=8.40e-05 gnorm=0.665 |   300,605 tok/s | mem=15.8GB | elapsed=12.2m ETA=8m
+  step     430 [████████████████████] loss=1.0208 (think=0.0052 resp=2.1282) | lr=8.60e-05 gnorm=0.800 |   292,255 tok/s | mem=15.8GB | elapsed=12.5m ETA=8m
+  step     440 [████████████████████] loss=1.2623 (think=0.0106 resp=1.7723) | lr=8.80e-05 gnorm=0.975 |   300,682 tok/s | mem=15.8GB | elapsed=12.8m ETA=7m
+  step     450 [████████████████████] loss=1.2081 (think=0.0118 resp=2.2160) | lr=9.00e-05 gnorm=0.950 |   300,552 tok/s | mem=15.8GB | elapsed=13.1m ETA=7m
+  step     460 [████████████████████] loss=1.2113 (think=0.0076 resp=1.9569) | lr=9.20e-05 gnorm=0.846 |   300,548 tok/s | mem=15.8GB | elapsed=13.4m ETA=7m
+  step     470 [████████████████████] loss=1.2671 (think=0.0033 resp=1.7317) | lr=9.40e-05 gnorm=0.920 |   291,310 tok/s | mem=15.8GB | elapsed=13.7m ETA=6m
+  step     480 [████████████████████] loss=0.9992 (think=0.0169 resp=1.3905) | lr=9.60e-05 gnorm=0.924 |   294,298 tok/s | mem=15.8GB | elapsed=13.9m ETA=6m
+  step     490 [████████████████████] loss=0.9905 (think=0.0038 resp=2.2109) | lr=9.80e-05 gnorm=0.687 |   300,415 tok/s | mem=15.8GB | elapsed=14.2m ETA=6m
+  step     500 [████████████████████] loss=1.2137 (think=0.0296 resp=1.4885) | lr=1.00e-04 gnorm=0.584 |   300,886 tok/s | mem=15.8GB | elapsed=14.5m ETA=6m
+
+─────────────────────────────────────────────────────────────────
+  📊 VALIDATION  step=500  val_loss=1.093405
+─────────────────────────────────────────────────────────────────
+  Q: What is the capital of France?
+  A: British Empire
+
+  Q: What is 15 multiplied by 17?
+  A: 15 x 3,480 = 2900.006x^2
+
+  Q: Tell me a short joke.
+  A: Sorry about it, I don't know how to answer it in the first place! 
+But it is so funny that you can make up your mind of what happened if someone would just laugh at me and run away with my money!
+
+  Q: Explain what a neural network is in simple terms.
+  A: A neural network (or more accurately, the " Network of Brain Systems") is a subsystem of the human brain that provides information about neurons and their states by using algorithms to process it. The...
+
+─────────────────────────────────────────────────────────────────
+
+
+─────────────────────────────────────────────────────────────────
+  💾 CHECKPOINT  step=500 | loss=1.2052 | think=0.0000 | resp=1.2540
+     tokens=3.342B | lr=1.00e-04 | size=3188 MB
+     → /vol/checkpoints/novamind_roll_latest.pt
+─────────────────────────────────────────────────────────────────
+
+  step     510 [████████████████████] loss=1.1125 (think=0.0297 resp=1.3397) | lr=9.94e-05 gnorm=0.663 |   300,398 tok/s | mem=15.8GB | elapsed=15.1m ETA=6m
+  step     520 [████████████████████] loss=1.0995 (think=0.0017 resp=1.9251) | lr=9.77e-05 gnorm=0.752 |   300,777 tok/s | mem=15.8GB | elapsed=15.4m ETA=5m
+  step     530 [████████████████████] loss=1.0558 (think=0.0090 resp=2.1797) | lr=9.48e-05 gnorm=0.767 |   300,701 tok/s | mem=15.8GB | elapsed=15.7m ETA=5m
+  step     540 [████████████████████] loss=0.9992 (think=0.0046 resp=2.1945) | lr=9.09e-05 gnorm=0.674 |   300,979 tok/s | mem=15.8GB | elapsed=16.0m ETA=5m
+  step     550 [████████████████████] loss=0.9163 (think=0.0026 resp=1.3548) | lr=8.60e-05 gnorm=0.649 |   301,041 tok/s | mem=15.8GB | elapsed=16.3m ETA=4m
+  step     560 [████████████████████] loss=1.1109 (think=0.0000 resp=2.4489) | lr=8.04e-05 gnorm=0.583 |   300,546 tok/s | mem=15.8GB | elapsed=16.6m ETA=4m
+  step     570 [████████████████████] loss=1.0719 (think=0.0093 resp=1.6699) | lr=7.41e-05 gnorm=0.558 |   300,623 tok/s | mem=15.8GB | elapsed=16.8m ETA=4m
+  step     580 [████████████████████] loss=0.9902 (think=0.0061 resp=2.3208) | lr=6.72e-05 gnorm=0.538 |   300,541 tok/s | mem=15.8GB | elapsed=17.1m ETA=3m
+  step     590 [████████████████████] loss=1.0740 (think=0.0029 resp=1.8986) | lr=6.01e-05 gnorm=0.540 |   300,462 tok/s | mem=15.8GB | elapsed=17.4m ETA=3m
+  step     600 [████████████████████] loss=1.1636 (think=0.0005 resp=2.4235) | lr=5.28e-05 gnorm=0.590 |   300,656 tok/s | mem=15.8GB | elapsed=17.7m ETA=3m
+  step     610 [████████████████████] loss=1.0070 (think=0.0103 resp=2.2433) | lr=4.56e-05 gnorm=0.700 |   300,705 tok/s | mem=15.8GB | elapsed=18.0m ETA=2m
+  step     620 [████████████████████] loss=1.1744 (think=0.0183 resp=2.0976) | lr=3.86e-05 gnorm=0.744 |   300,681 tok/s | mem=15.8GB | elapsed=18.3m ETA=2m
+  step     630 [████████████████████] loss=1.0927 (think=0.0053 resp=1.9465) | lr=3.21e-05 gnorm=0.491 |   300,820 tok/s | mem=15.8GB | elapsed=18.6m ETA=2m
+  step     640 [████████████████████] loss=0.8904 (think=0.0059 resp=1.4536) | lr=2.61e-05 gnorm=0.528 |   300,465 tok/s | mem=15.8GB | elapsed=18.8m ETA=2m
+  step     650 [████████████████████] loss=1.0574 (think=0.0039 resp=1.7072) | lr=2.09e-05 gnorm=0.514 |   300,387 tok/s | mem=15.8GB | elapsed=19.1m ETA=1m
+  step     660 [████████████████████] loss=1.0562 (think=0.0040 resp=1.8388) | lr=1.67e-05 gnorm=0.479 |   300,503 tok/s | mem=15.8GB | elapsed=19.4m ETA=1m
+  step     670 [████████████████████] loss=1.0360 (think=0.0057 resp=1.2987) | lr=1.34e-05 gnorm=0.799 |   300,473 tok/s | mem=15.8GB | elapsed=19.7m ETA=1m
+  step     680 [████████████████████] loss=0.9230 (think=0.0045 resp=1.9609) | lr=1.12e-05 gnorm=0.702 |   300,664 tok/s | mem=15.8GB | elapsed=20.0m ETA=0m
+  step     690 [████████████████████] loss=1.0236 (think=0.0034 resp=1.8634) | lr=1.01e-05 gnorm=0.506 |   300,496 tok/s | mem=15.8GB | elapsed=20.2m ETA=0m
+
+  ✅ Epoch 2/2 done | steps=692 | tokens=3.368B
+
+
+─────────────────────────────────────────────────────────────────
+  💾 CHECKPOINT  step=692 | loss=0.7103 | think=0.0176 | resp=0.7418
+     tokens=3.368B | lr=1.00e-05 | size=3188 MB
+     → /vol/checkpoints/novamind_roll_latest.pt
+     → MILESTONE novamind_milestone_0000692.pt
+     → PHASE FINAL novamind_sft_final.pt
+─────────────────────────────────────────────────────────────────
+
+
+═════════════════════════════════════════════════════════════════
+  ✅ Phase SFT COMPLETE
+     Steps        : 692 / 694
+     Tokens seen  : 3.368B
+     Total time   : 20.6 min
+     Final loss   : 0.710349
+     Checkpoints  : /vol/checkpoints/
+═════════════════════════════════════════════════════════════════
+
+
+📊 Training complete. Logs saved:
+   /vol/checkpoints/log_sft_20260501_083611.jsonl
+   /vol/checkpoints/log_sft_20260501_083611.csv
+  ▶ Next: python train.py --phase cot_sft --resume /vol/checkpoints/novamind_sft_final.pt
+
+
+✅ Phase 2 SFT complete!
+   Final checkpoint: /vol/checkpoints/novamind_sft_final.pt
+
+  Download with:
+    modal volume get novamind-vol /checkpoints/novamind_sft_final.pt ./checkpoints/novamind_sft_final.pt
+Stopping app - local entrypoint completed.
