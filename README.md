@@ -69,7 +69,7 @@ python chat.py
 ## 🛠️ How to use it
 
 `make sure you have novamind_sft_final.pt` in `checkpoints/` folder`  
-download from: [HuggingFace]([https://modal.com](https://huggingface.co/MrEngineer/novamind-256m/blob/main/model.safetensors)
+download from: [HuggingFace](https://huggingface.co/MrEngineer/novamind-256m/blob/main/model.safetensors)
 
 ### Run the REPL
 
